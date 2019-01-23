@@ -1,0 +1,42 @@
+{
+    "name": "tienvx/messenger-memory-transport",
+    "type": "library",
+    "description": "Symfony Messenger transport for the memory (testing purpose).",
+    "keywords": ["messenger", "queue", "memory", "transport", "symfony"],
+    "license": "MIT",
+    "authors": [
+        {
+          "name": "Tien Xuan Vo",
+          "email": "tien.xuan.vo@gmail.com",
+          "role": "Developer"
+        },
+        {
+            "name": "Community contributions",
+            "homepage": "https://github.com/tienvx/messenger-memory-transport/contributors"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3",
+        "symfony/messenger": "^4.2.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.4",
+        "php-coveralls/php-coveralls": "^2.1",
+        "friendsofphp/php-cs-fixer": "^2.14"
+    },
+    "autoload": {
+        "psr-4": {
+            "Tienvx\\Messenger\\MemoryTransport\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tienvx\\Messenger\\MemoryTransport\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.1.x-dev"
+        }
+    }
+}
