@@ -16,10 +16,9 @@ class Connection
 
     public function get()
     {
-        // Memory transport use the same method with pnz/messenger-filesystem-transport: LIFO (Last In, First Out), not
-        // FIFO (First In, First Out).
-        //return array_shift($this->messages);
-        return array_pop($this->messages);
+        // Memory transport use FIFO (First In, First Out), not LIFO (Last In, First Out) as in
+        // pnz/messenger-filesystem-transport
+        return array_shift($this->messages);
     }
 
     public function has()

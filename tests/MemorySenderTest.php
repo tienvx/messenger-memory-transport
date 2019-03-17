@@ -21,8 +21,9 @@ class MemorySenderTest extends TestCase
         $envelope = new Envelope((object) ['the final message']);
         $result = $sender->send($envelope);
         $this->assertInstanceOf(Envelope::class, $result);
-        /** @var Envelope $message */
-        $message = $connection->get();
+        do {
+            $message = $connection->get();
+        } while (!$message instanceof Envelope);
         $this->assertEquals('the final message', ((array) $message->getMessage())[0]);
     }
 }

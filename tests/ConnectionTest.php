@@ -17,8 +17,8 @@ class ConnectionTest extends TestCase
         $connection->publish('the last message');
 
         $this->assertTrue($connection->has());
-        $this->assertEquals('the last message', $connection->get());
-        $this->assertEquals('the third message', $connection->get());
+        $this->assertEquals('the first message', $connection->get());
+        $this->assertEquals('the second message', $connection->get());
         $this->assertTrue($connection->has());
         $connection->clear();
         $this->assertFalse($connection->has());

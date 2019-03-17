@@ -18,9 +18,9 @@ class MemoryReceiverTest extends TestCase
 
         $receiver = new MemoryReceiver($connection);
         $receiver->receive(function ($message) {
-            $this->assertEquals('the last message', $message);
+            $this->assertEquals('the first message', $message);
         });
         $receiver->stop();
-        $this->assertEquals('the third message', $connection->get());
+        $this->assertEquals('the second message', $connection->get());
     }
 }

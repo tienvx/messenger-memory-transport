@@ -20,7 +20,7 @@ class MemoryTransportTest extends TestCase
         $transport = new MemoryTransport($connection);
 
         $transport->receive(function ($message) {
-            $this->assertEquals('the last message', $message);
+            $this->assertEquals('the first message', $message);
         });
 
         $transport->stop();
@@ -28,8 +28,9 @@ class MemoryTransportTest extends TestCase
         $envelope = new Envelope((object) ['the final message']);
         $result = $transport->send($envelope);
         $this->assertInstanceOf(Envelope::class, $result);
-        /** @var Envelope $message */
-        $message = $connection->get();
-        $this->assertEquals('the final message', ((array) $message->getMessage())[0]);
+        do {
+            $message = $connection->get();
+        } while (!$message instanceof Envelope);
+        $this->assertEquals('the final message', ((array) $envelope->getMessage())[0]);
     }
 }
