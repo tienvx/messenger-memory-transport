@@ -34,6 +34,20 @@ class MemoryTransportTest extends TestCase
         $this->assertInstanceOf(DummyMessage::class, $messages[2]->getMessage());
         $this->assertEquals('the third message', $messages[2]->getMessage()->getMessage());
 
+        /** @var Envelope[] $messages */
+        $messages = $transport->getAcknowledged();
+        $this->assertCount(1, $messages);
+
+        $this->assertInstanceOf(DummyMessage::class, $messages[0]->getMessage());
+        $this->assertEquals('the second message', $messages[0]->getMessage()->getMessage());
+
+        /** @var Envelope[] $messages */
+        $messages = $transport->getRejected();
+        $this->assertCount(1, $messages);
+
+        $this->assertInstanceOf(DummyMessage::class, $messages[0]->getMessage());
+        $this->assertEquals('the last message', $messages[0]->getMessage()->getMessage());
+
         $transport->reset();
 
         /** @var Envelope[] $messages */
