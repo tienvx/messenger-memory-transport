@@ -3,41 +3,106 @@
 namespace Tienvx\Messenger\MemoryTransport;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\LogicException;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\TransportInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
-class MemoryTransport implements TransportInterface
+class MemoryTransport implements TransportInterface, ResetInterface
 {
-    private $connection;
-    private $receiver;
-    private $sender;
+    /**
+     * @var Envelope[]
+     */
+    private $sent = [];
 
-    public function __construct(Connection $connection)
+    /**
+     * @var Envelope[]
+     */
+    private $acknowledged = [];
+
+    /**
+     * @var Envelope[]
+     */
+    private $rejected = [];
+
+    /**
+     * @var int
+     */
+    private $index = 0;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get(): iterable
     {
-        $this->connection = $connection;
+        return $this->sent;
     }
 
-    public function receive(callable $handler): void
+    /**
+     * {@inheritdoc}
+     */
+    public function ack(Envelope $envelope): void
     {
-        ($this->receiver ?? $this->getReceiver())->receive($handler);
+        $this->acknowledged[] = $envelope;
+        $id = $this->findMessageIdStamp($envelope)->getId();
+        unset($this->sent[$id]);
     }
 
-    public function stop(): void
+    /**
+     * {@inheritdoc}
+     */
+    public function reject(Envelope $envelope): void
     {
-        ($this->receiver ?? $this->getReceiver())->stop();
+        $this->rejected[] = $envelope;
+        $id = $this->findMessageIdStamp($envelope)->getId();
+        unset($this->sent[$id]);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function send(Envelope $envelope): Envelope
     {
-        return ($this->sender ?? $this->getSender())->send($envelope);
+        $envelope = $envelope->with(
+            new TransportMessageIdStamp($this->index)
+        );
+        $this->sent[$this->index] = $envelope;
+        ++$this->index;
+
+        return $envelope;
     }
 
-    private function getReceiver()
+    public function reset()
     {
-        return $this->receiver = new MemoryReceiver($this->connection);
+        $this->sent = $this->rejected = $this->acknowledged = [];
+        $this->index = 0;
     }
 
-    private function getSender()
+    /**
+     * @return Envelope[]
+     */
+    public function getAcknowledged(): array
     {
-        return $this->sender = new MemorySender($this->connection);
+        return $this->acknowledged;
+    }
+
+    /**
+     * @return Envelope[]
+     */
+    public function getRejected(): array
+    {
+        return $this->rejected;
+    }
+
+    private function findMessageIdStamp(Envelope $envelope): TransportMessageIdStamp
+    {
+        /** @var TransportMessageIdStamp|null $messageIdStamp */
+        $messageIdStamp = $envelope->last(TransportMessageIdStamp::class);
+
+        if (null === $messageIdStamp) {
+            throw new LogicException('No TransportMessageIdStamp found on the Envelope.');
+        }
+
+        return $messageIdStamp;
     }
 }
