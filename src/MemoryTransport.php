@@ -67,7 +67,7 @@ class MemoryTransport implements TransportInterface, ResetInterface
             new TransportMessageIdStamp($this->index)
         );
         $this->sent[$this->index] = $envelope;
-        $this->index++;
+        ++$this->index;
 
         return $envelope;
     }
