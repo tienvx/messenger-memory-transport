@@ -3,8 +3,6 @@
 Extends the [Symfony Messenger](https://symfony.com/doc/master/components/messenger.html) component to
 handle the memory transport.
 
-The queuing is implemented as a *LIFO* (Last-In, First-Out) list.
-
 This project is for testing purpose.
 
 ## Install
