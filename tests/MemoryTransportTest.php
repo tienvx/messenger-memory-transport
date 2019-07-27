@@ -20,33 +20,51 @@ class MemoryTransportTest extends TestCase
 
         /** @var Envelope[] $messages */
         $messages = $transport->get();
-        $this->assertCount(4, $messages);
-
-        $transport->ack($messages[1]);
-        $transport->reject($messages[3]);
+        $this->assertCount(1, $messages);
+        $this->assertInstanceOf(DummyMessage::class, $messages[0]->getMessage());
+        $this->assertEquals('the first message', $messages[0]->getMessage()->getMessage());
+        $transport->ack($messages[0]);
 
         /** @var Envelope[] $messages */
         $messages = $transport->get();
-        $this->assertCount(2, $messages);
-
+        $this->assertCount(1, $messages);
         $this->assertInstanceOf(DummyMessage::class, $messages[0]->getMessage());
-        $this->assertEquals('the first message', $messages[0]->getMessage()->getMessage());
-        $this->assertInstanceOf(DummyMessage::class, $messages[2]->getMessage());
-        $this->assertEquals('the third message', $messages[2]->getMessage()->getMessage());
+        $this->assertEquals('the second message', $messages[0]->getMessage()->getMessage());
+        $transport->ack($messages[0]);
+
+        /** @var Envelope[] $messages */
+        $messages = $transport->get();
+        $this->assertCount(1, $messages);
+        $this->assertInstanceOf(DummyMessage::class, $messages[0]->getMessage());
+        $this->assertEquals('the third message', $messages[0]->getMessage()->getMessage());
+        $transport->reject($messages[0]);
+
+        /** @var Envelope[] $messages */
+        $messages = $transport->get();
+        $this->assertCount(1, $messages);
+        $this->assertInstanceOf(DummyMessage::class, $messages[0]->getMessage());
+        $this->assertEquals('the last message', $messages[0]->getMessage()->getMessage());
+        $transport->ack($messages[0]);
+
+        /** @var Envelope[] $messages */
+        $messages = $transport->get();
+        $this->assertCount(0, $messages);
 
         /** @var Envelope[] $messages */
         $messages = $transport->getAcknowledged();
-        $this->assertCount(1, $messages);
-
+        $this->assertCount(3, $messages);
         $this->assertInstanceOf(DummyMessage::class, $messages[0]->getMessage());
-        $this->assertEquals('the second message', $messages[0]->getMessage()->getMessage());
+        $this->assertEquals('the first message', $messages[0]->getMessage()->getMessage());
+        $this->assertInstanceOf(DummyMessage::class, $messages[1]->getMessage());
+        $this->assertEquals('the second message', $messages[1]->getMessage()->getMessage());
+        $this->assertInstanceOf(DummyMessage::class, $messages[2]->getMessage());
+        $this->assertEquals('the last message', $messages[2]->getMessage()->getMessage());
 
         /** @var Envelope[] $messages */
         $messages = $transport->getRejected();
         $this->assertCount(1, $messages);
-
         $this->assertInstanceOf(DummyMessage::class, $messages[0]->getMessage());
-        $this->assertEquals('the last message', $messages[0]->getMessage()->getMessage());
+        $this->assertEquals('the third message', $messages[0]->getMessage()->getMessage());
 
         $transport->reset();
 

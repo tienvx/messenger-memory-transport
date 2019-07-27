@@ -35,7 +35,7 @@ class MemoryTransport implements TransportInterface, ResetInterface
      */
     public function get(): iterable
     {
-        return $this->sent;
+        return !empty($this->sent) ? [reset($this->sent)] : [];
     }
 
     /**
